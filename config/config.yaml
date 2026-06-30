@@ -1,0 +1,24 @@
+# game-slang-miner 全局配置
+# 所有路径相对于仓库根目录；运行时由 pipeline 解析为绝对路径。
+
+# 自动挖掘参数（N-gram + PMI + 左右熵）
+mining:
+  ngram_min: 2          # 最短 n-gram（字数）
+  ngram_max: 4          # 最长 n-gram（字数）
+  min_freq: 3           # 候选词最低频次
+  min_pmi: 1.0          # 候选词最低点互信息
+  min_entropy: 1.0      # 候选词左右熵最低阈值（取左右熵较小值）
+  max_candidates: 3000  # 输出候选上限
+
+# LLM 配置：默认离线 mock，无需 API key 即可端到端跑通
+llm:
+  provider: "mock"      # mock | anthropic | openai
+  model: ""             # 真实模型名（provider != mock 时填写）
+  offline: true         # true=离线 mock；false=走真实 API（需环境变量提供 key）
+
+# 输入 / 输出路径
+paths:
+  comments: "data/samples/comments.jsonl"
+  entities: "data/knowledge/entities.csv"
+  seeds: "data/seeds/known_slang.csv"
+  out_dir: "outputs"

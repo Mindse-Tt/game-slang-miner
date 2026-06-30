@@ -1,0 +1,8 @@
+# 运行时依赖
+jieba>=0.42.1        # 中文分词（挖掘阶段 n-gram 切分辅助）
+openpyxl>=3.0.0     # 周报 xlsx 读写
+pyyaml>=5.4         # 解析 config/config.yaml
+
+# 可选：真实 LLM provider（离线 mock 模式不需要安装）
+# anthropic>=0.40.0   # provider=anthropic 时启用
+# openai>=1.0.0       # provider=openai 时启用

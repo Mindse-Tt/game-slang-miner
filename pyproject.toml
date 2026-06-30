@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "game-slang-miner"
+version = "0.2.0"
+description = "游戏玩家社区黑话自动挖掘流水线 v2（N-gram+PMI+左右熵 候选挖掘 + 3 Agent 串行审查）"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "game-slang-miner contributors" }]
+keywords = ["nlp", "slang", "mining", "ngram", "pmi", "agent", "chinese"]
+dependencies = [
+    "jieba>=0.42.1",
+    "openpyxl>=3.0.0",
+    "pyyaml>=5.4",
+]
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=0.40.0"]
+openai = ["openai>=1.0.0"]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+slang-miner = "slang_miner.cli:main"
+
+[tool.pytest.ini_options]
+# src 布局：让本地 `pytest`（未做 editable 安装时）也能 import 到 slang_miner。
+# CI 中我们额外执行 `pip install -e .`，从而同时覆盖「真实安装路径」。
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+slang_miner = ["py.typed"]
