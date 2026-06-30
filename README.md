@@ -1,12 +1,35 @@
-# game-slang-miner · 游戏玩家社区「黑话」自动挖掘流水线 v2
+<div align="center">
 
-> **Game-Community Slang Auto-Mining Pipeline v2**
-> 从玩家评论中自动挖掘「黑话」候选 → 3 个 Agent 串行审查 → 导出人工审核周报 → 闭环回灌，越用越准。
-> An end-to-end pipeline that mines community slang candidates from player comments, runs a 3-agent serial review, exports a human-review workbook, and feeds confirmed terms back into the dictionary.
+# 🎮 game-slang-miner
+### 游戏玩家社区「黑话」自动挖掘流水线 v2
 
-[![CI](https://github.com/OWNER/game-slang-miner/actions/workflows/ci.yml/badge.svg)](../../actions)
+**从海量玩家评论里，自动挖出官方词典查不到的「黑话」——并且越用越准。**
+
+_Mine community slang from player comments → 3-agent serial review → human-review workbook → self-improving feedback loop._
+
+[![CI](https://github.com/Mindse-Tt/game-slang-miner/actions/workflows/ci.yml/badge.svg)](../../actions)
 ![python](https://img.shields.io/badge/python-3.9%2B-blue)
+![deps](https://img.shields.io/badge/runtime%20deps-3%20(轻量)-brightgreen)
+![offline](https://img.shields.io/badge/离线可跑-无需%20API%20Key-success)
 ![license](https://img.shields.io/badge/license-MIT-green)
+
+<br/>
+
+<img src="docs/architecture.png" alt="游戏黑话自动挖掘流水线 v2 架构图" width="100%"/>
+
+</div>
+
+---
+
+## ✨ 30 秒看懂 · TL;DR
+
+- **它解决什么**：游戏运营每天读不完的玩家评论里全是 `御三家`、`奶妈`、`非酋`、`打本` 这类查无此词的黑话，人工整理慢且易漏。
+- **它怎么做**：`N-gram + PMI + 左右熵` 自动挖候选 → **3 个 Agent 串行审查**（分类→释义→兜底）→ 导出周报 `xlsx` 给人工只做「判对错」→ 确认词回灌词典，**下一轮更准**。
+- **为什么能直接跑**：**默认离线 mock 模式，零 API Key、一条命令端到端跑通**；想要更准再一键切真实 LLM。
+
+```bash
+pip install -e . && slang-miner run     # 就这一行，立刻看到 outputs/ 里的审核周报
+```
 
 ---
 
@@ -139,7 +162,7 @@ flowchart TD
 需要 Python **3.9+**。
 
 ```bash
-git clone https://github.com/OWNER/game-slang-miner.git
+git clone https://github.com/Mindse-Tt/game-slang-miner.git
 cd game-slang-miner
 
 python -m pip install --upgrade pip
@@ -326,6 +349,8 @@ pytest --cov=src --cov-report=term-missing # 覆盖率
 - [ ] 闭环：记录每个词的审核历史与版本，支持回滚与审计。
 - [ ] 数据源：内置 B站 / 贴吧 / TapTap 评论采集适配器（可选、合规）。
 - [ ] 评测：构造黄金集，量化挖掘召回率与 Agent 准确率，做回归看护。
+- [ ] **链接即输入**：给定一个 URL（视频/帖子/榜单页），自动抓取正文与评论 → 直接喂进挖掘链路（`ingest/url_fetcher.py` 适配器，注意 robots 与合规）。
+- [ ] **舆情拓展**：在黑话挖掘之上增量做情感/话题/热度分析——新词的情绪倾向、突增势头、关联事件，输出「黑话 + 舆情」联合周报，把"发现新词"升级为"发现正在发生的社区情绪"。
 
 ---
 
