@@ -23,6 +23,7 @@ from __future__ import annotations
 import json
 import os
 import re
+from pathlib import Path
 from abc import ABC
 from typing import Any, Callable, Dict, Optional
 
@@ -35,6 +36,19 @@ DEFAULT_OPENAI_MODEL = "gpt-4o"
 # 环境变量名（真实模式从这里取 key）
 ENV_ANTHROPIC_KEY = "ANTHROPIC_API_KEY"
 ENV_OPENAI_KEY = "OPENAI_API_KEY"
+
+
+def load_prompt(name: str, fallback: str = "") -> str:
+    """从仓库根 agents/<name>.md 读取该 Agent 的角色卡作为 system prompt。
+    去掉以 > 开头的元信息行;读不到(如非 editable 安装)则回退到类内硬编码 fallback。"""
+    try:
+        p = Path(__file__).resolve().parents[3] / "agents" / f"{name}.md"
+        text = p.read_text(encoding="utf-8")
+        lines = [ln for ln in text.splitlines() if not ln.lstrip().startswith(">")]
+        cleaned = "\n".join(lines).strip()
+        return cleaned or fallback
+    except Exception:
+        return fallback
 
 
 def parse_json(raw: str) -> Optional[Dict[str, Any]]:
@@ -282,8 +296,17 @@ class BaseAgent(ABC):
 
         返回 None 表示解析失败，调用方应给出领域兜底默认值。
         """
-        raw = self.client.chat(self.SYSTEM_PROMPT, user)
+        raw = self.client.chat(self._system_prompt(), user)
         return parse_json(raw)
+
+    def _system_prompt(self) -> str:
+        """优先读外置 md 角色卡(agents/<PROMPT_NAME>.md),回退类内 SYSTEM_PROMPT。"""
+        name = getattr(self, "PROMPT_NAME", None)
+        if name:
+            md = load_prompt(name, "")
+            if md:
+                return md
+        return self.SYSTEM_PROMPT
 
     def _mock_logic(self, user: str) -> str:  # pragma: no cover - 抽象占位
         """子类实现：离线启发式，返回 JSON 字符串。"""

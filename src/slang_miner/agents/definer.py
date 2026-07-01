@@ -25,6 +25,7 @@ from .base import BaseAgent, parse_json
 class DefinerAgent(BaseAgent):
     """Agent2：黑话释义器。"""
 
+    PROMPT_NAME = "definer"
     SYSTEM_PROMPT = (
         "你是游戏玩家社区「黑话」释义专家。给定一个已被判定为黑话的候选词及其在玩家"
         "评论中的原文例句，请：\n"

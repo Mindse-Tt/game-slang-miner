@@ -220,6 +220,27 @@ export_review_xlsx(entries, "review.xlsx")   # 导出人工审核周报
 
 ---
 
+## 🧠 md 定义的 Agent Team · Agents as Editable Markdown
+
+这套流水线的核心是一个 **3-agent 串行审查团队**,而且**每个 agent 的判断标准就是一份可编辑的 markdown**:
+
+| Agent | 角色卡(判断标准) | 职责 |
+|---|---|---|
+| Classifier | [`agents/classifier.md`](agents/classifier.md) | 是不是黑话?7 类分类 |
+| Definer | [`agents/definer.md`](agents/definer.md) | 什么意思?释义 + 原文例句 |
+| Reviewer | [`agents/reviewer.md`](agents/reviewer.md) | 真指代游戏内事物吗?keep / reject 兜底 |
+
+- **代码从这些 md 读取 system prompt**(`agents/base.py` 的 `load_prompt` + `_system_prompt`),类内硬编码 prompt 仅作离线 fallback。
+- **人工校准 = 直接编辑 md**:每份角色卡都有「校准区」,人审确认 / 否决的正反例往里加,下一轮 agent 判得更准 —— *机器管召回,人管标准*。
+- **在 Claude Code 里直接跑整个 team**:仓库带了 [`.claude/agents/`](.claude/agents) 三个子代理(slang-classifier / definer / reviewer),用真实模型跑,**无需 API key**。
+
+> agent 不是焊死在代码里的黑盒,而是一份你能读、能改、能版本管理的 md 角色卡。
+
+### 怎么接进你的 RAG · Plug into your RAG
+整理好的黑话库,用**词语精确匹配**接入(命中即注入定义),与 RAG 向量检索**解耦** —— 避免向量检索对专名命中率不稳、对非黑话硬匹配produce 幻觉。
+
+<img src="docs/usage-plugin.png" alt="黑话库怎么接进大模型:精确匹配插件,与 RAG 解耦" width="100%"/>
+
 ## 作为 Claude Code Skill 使用 · Use as a Claude Code Skill
 
 仓库内置了一个 Claude Code 技能(`skill/game-slang-miner/SKILL.md`)。装上后,在 Claude Code 里直接说
@@ -302,6 +323,10 @@ game-slang-miner/
 ├── requirements.txt
 ├── config/config.yaml             # 全局配置
 ├── docs/architecture.{svg,png}    # 架构图（README 顶部大图）
+├── docs/usage-plugin.png          # 使用机制图（接入 RAG）
+├── docs/mining-pipeline.png       # 挖掘流水线竖版图
+├── agents/                        # ★ 3 个 agent 的 md 角色卡（判断标准，可编辑 + 校准区）
+├── .claude/agents/                # ★ Claude Code 子代理版（可直接跑整个 team）
 ├── skill/game-slang-miner/        # Claude Code 技能（SKILL.md）
 ├── data/
 │   ├── samples/comments.jsonl     # 样例玩家评论

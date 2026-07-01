@@ -35,6 +35,7 @@ _MIN_TERM_LEN = 2
 class ReviewerAgent(BaseAgent):
     """Agent3：严格复核器 / 质量闸门。"""
 
+    PROMPT_NAME = "reviewer"
     SYSTEM_PROMPT = (
         "你是游戏黑话词典的严格质检员，是流水线的最后一道关卡。给定一个候选黑话词条"
         "（含释义与原文例句），请严格判断：它是否**真正指代游戏内的事物或玩家行为**"

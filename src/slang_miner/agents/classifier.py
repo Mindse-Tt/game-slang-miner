@@ -17,7 +17,7 @@ import json
 from typing import Any, Dict, List, Optional, Tuple
 
 from ..schema import Candidate, ClassifierResult, SlangCategory
-from .base import BaseAgent, LLMClient
+from .base import BaseAgent, LLMClient, load_prompt
 
 # ----------------------------------------------------------------------------
 # mock 启发式所用的「类别关键词表」。
@@ -37,6 +37,7 @@ _CATEGORY_KEYWORDS: List[Tuple[SlangCategory, Tuple[str, ...]]] = [
 class ClassifierAgent(BaseAgent):
     """Agent1：黑话分类器。"""
 
+    PROMPT_NAME = "classifier"
     SYSTEM_PROMPT = (
         "你是游戏玩家社区「黑话」识别专家。给定一个从玩家评论中自动挖掘出的候选词"
         "及其例句，判断它是否为玩家黑话（区别于官方术语和普通词语），并归入 7 类之一："
